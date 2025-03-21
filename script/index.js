@@ -13,10 +13,11 @@ function loadCategory() {
             displayCategory(data.categories);
         })
 }
-function loadVideos() {
-    fetch('https://openapi.programming-hero.com/api/phero-tube/videos')
+function loadVideos(searchText='') {
+    fetch(`https://openapi.programming-hero.com/api/phero-tube/videos?title=${searchText}`)
         .then(res => res.json())
         .then(data => {
+            // removeActiveClass();
             document.getElementById('btn-all').classList.add('active');
             displayVideos(data.videos);
         })
@@ -48,17 +49,14 @@ const videoDetails = (video) => {
     `;
 }
 const loadCategoryVideos = (id) => {
-    // console.log(id);
     const url = `https://openapi.programming-hero.com/api/phero-tube/category/${id}`;
 
     fetch(url)
         .then((res) => res.json())
         .then((data) => {
-            // console.log(`btn-${id}`);
             removeActiveClass();
             const clickedButton = document.getElementById(`btn-${id}`);
             clickedButton.classList.add("active");
-            // console.log(clickedButton);
 
             displayVideos(data.category);
         });
@@ -79,7 +77,6 @@ const displayVideos = (videos) => {
     }
 
     videos.forEach(element => {
-        // console.log(element);
         const videoCard = document.createElement("div");
         videoCard.innerHTML = `
         <div class="card bg-base-100">
@@ -96,15 +93,18 @@ const displayVideos = (videos) => {
                       </div>
                 </div>
                 <div class="intro">
-                    <h2 class="font-semibold text-sm">something</h2>
-                    <p class="text-sm text-gray-400 flex gap-1">${element.authors[0].profile_name} <img class="w-5" src="https://img.icons8.com/?size=100&id=98A4yZTt9abw&format=png&color=000000" alt=""></p>
+                    <h2 class="font-semibold text-sm">${element.title}</h2>
+                    <p class="text-sm text-gray-400 flex gap-1">
+                    ${element.authors[0].profile_name}
+                    ${element.authors[0].verified == true ? `<img class="w-5" src="https://img.icons8.com/?size=100&id=98A4yZTt9abw&format=png&color=000000" alt="">` : `` }
+
+                     </p>
                     <p class="text-sm text-gray-400">${element.others.views} views</p>
                 </div>
             </div>
             <button onclick = loadVideoDetails('${element.video_id}') class="btn btn-block">Show Details</button>
         </div>
         `
-        // append
         videoContainer.append(videoCard)
     });
 }
@@ -115,4 +115,9 @@ function displayCategory(data) {
         categoryContainer.innerHTML += `<button id="btn-${data[i].category_id}" onclick="loadCategoryVideos(${data[i].category_id})" class="btn btn-sm hover:bg-[#FF1F3D] hover:text-white">${data[i].category}</button>`
     }
 }
+document.getElementById('search-input').addEventListener("keyup", (e)=>{
+    const input = e.target.value;
+    loadVideos(input);
+
+});
 loadCategory();
