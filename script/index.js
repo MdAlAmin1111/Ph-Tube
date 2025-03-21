@@ -1,6 +1,6 @@
-function removeActiveClass(){
+function removeActiveClass() {
     const activebtn = document.getElementsByClassName('active');
-    for(let i = 0; i<activebtn.length; i++){
+    for (let i = 0; i < activebtn.length; i++) {
         activebtn[i].classList.remove('active');
     }
 }
@@ -21,34 +21,32 @@ function loadVideos() {
             displayVideos(data.videos);
         })
 }
-/*
-{category_id: '1001', video_id: 'aaaa', thumbnail: 'https://i.ibb.co/L1b6xSq/shape.jpg', title: 'Shape of You', authors: Array(1), …}
-authors
-: 
-[{…}]
-category_id
-: 
-"1001"
-description
-: 
-"Dive into the rhythm of 'Shape of You,' a captivating track that blends pop sensibilities with vibrant beats. Created by Olivia Mitchell, this song has already gained 100K views since its release. With its infectious melody and heartfelt lyrics, 'Shape of You' is perfect for fans looking for an uplifting musical experience. Let the music take over as Olivia's vocal prowess and unique style create a memorable listening journey."
-others
-: 
-{views: '100K', posted_date: '16278'}
-thumbnail
-: 
-"https://i.ibb.co/L1b6xSq/shape.jpg"
-title
-: 
-"Shape of You"
-video_id
-: 
-"aaaa"
-[[Prototype]]
-: 
-Object
-*/
+function loadVideoDetails(vidoeId) {
+    const url = `https://openapi.programming-hero.com/api/phero-tube/video/${vidoeId}`;
+    fetch(url)
+        .then(res => res.json())
+        .then(data => videoDetails(data.video))
+}
 
+const videoDetails = (video) => {
+    console.log(video);
+    document.getElementById('video_details').showModal();
+    const detailsContainer = document.getElementById('details_container');
+    detailsContainer.innerHTML =
+        `
+  <div class="card bg-base-100 image-full shadow-sm">
+  <figure>
+    <img
+      src="${video.thumbnail}"
+      alt="Shoes" />
+  </figure>
+  <div class="card-body">
+    <h2 class="card-title">${video.title}</h2>
+    <p>${video.description}</p>
+  </div>
+</div>
+    `;
+}
 const loadCategoryVideos = (id) => {
     // console.log(id);
     const url = `https://openapi.programming-hero.com/api/phero-tube/category/${id}`;
@@ -61,9 +59,9 @@ const loadCategoryVideos = (id) => {
             const clickedButton = document.getElementById(`btn-${id}`);
             clickedButton.classList.add("active");
             // console.log(clickedButton);
-            
+
             displayVideos(data.category);
-        })
+        });
 }
 
 const displayVideos = (videos) => {
@@ -103,6 +101,7 @@ const displayVideos = (videos) => {
                     <p class="text-sm text-gray-400">${element.others.views} views</p>
                 </div>
             </div>
+            <button onclick = loadVideoDetails('${element.video_id}') class="btn btn-block">Show Details</button>
         </div>
         `
         // append
